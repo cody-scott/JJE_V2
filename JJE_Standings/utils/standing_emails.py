@@ -3,7 +3,7 @@ from django.utils import timezone
 
 from JJE_Standings.models import YahooStanding
 
-from JJE_Waivers.utils.email_functions import construct_send_email
+# from JJE_Waivers.utils.email_functions import construct_send_email
 
 
 def send_standings_email(standings_html):

@@ -41,17 +41,16 @@ def callback_oauth(request):
     oauth = create_oauth_session(state=request.session['oauth_state'])
     token = oauth.fetch_token(token_url, client_secret=client_secret,
                               authorization_response=callback_url)
-    save_token(token, request)
+    save_new_token(token, request)
 
 
-def save_token(token, request, user_token=None):
+def save_new_token(token, request):
     access_token = token.get("access_token")
     refresh_token = token.get("refresh_token")
     guid = token.get("xoauth_yahoo_guid")
 
-    if user_token is None:
-        user_token = UserToken()
-        user_token.user = request.user
+    user_token = UserToken()
+    user_token.user = request.user
 
     user_token.client_id = client_id
     user_token.client_secret = client_secret
@@ -59,7 +58,7 @@ def save_token(token, request, user_token=None):
     user_token.refresh_token = refresh_token
     user_token.user_guid = guid
 
-    if len(UserToken.objects.filter(standings_token=False) == 0):
+    if len(UserToken.objects.filter(standings_token=False)) == 0:
         user_token.standings_token = True
 
     user_token.save()
@@ -74,7 +73,7 @@ def refresh_current_token(request):
     refresh_user_token(request, user_token)
 
 
-def refresh_user_token(request, user_token):
+def refresh_user_token(user_token):
     extra = {
         'client_id': user_token.client_id,
         'client_secret': user_token.client_secret,
@@ -87,5 +86,21 @@ def refresh_user_token(request, user_token):
         **extra
     )
 
-    save_token(new_token, request, user_token)
-    return
+    save_refresh_token(new_token, user_token)
+    return user_token
+
+
+def save_refresh_token(token, user_token=None):
+    access_token = token.get("access_token")
+    refresh_token = token.get("refresh_token")
+    guid = token.get("xoauth_yahoo_guid")
+
+    user_token.client_id = client_id
+    user_token.client_secret = client_secret
+    user_token.access_token = access_token
+    user_token.refresh_token = refresh_token
+    user_token.user_guid = guid
+
+    user_token.save()
+
+    return user_token

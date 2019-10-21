@@ -1,4 +1,4 @@
-from JJE_Standings.models import YahooStanding
+from JJE_Standings.models import YahooStanding, YahooGUID
 
 from Yahoo_Authentication.utils.oauth_flow import refresh_user_token, create_oauth_session
 from Yahoo_Authentication.models import UserToken
@@ -7,54 +7,21 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import math
 
-from JJE_App.settings import LEAGUE_ID
+from JJE_App.settings import LEAGUE_ID, STARTING_WEEK
 
 
-def create_session(request):
+def create_session():
     token = UserToken.objects.get(standings_token=True)
-    oauth = create_oauth_session(_client_id=token.client_id,
-                                 token=token.access_token)
-
-    refresh_user_token(request, token)
-    token = UserToken.objects.get(standings_token=True)
+    token = refresh_user_token(token)
     oauth = create_oauth_session(_client_id=token.client_id,
                                  token=token.access_token)
     return oauth
 
 
-def build_team_data(request):
-    yahoo_obj = create_session(request)
-    url = "https://fantasysports.yahooapis.com/" \
-          "fantasy/v2/league/{}/standings".format(LEAGUE_ID)
-
-    result = yahoo_obj.get(url)
-    results, status_code = result.text, result.status_code
-    if (result.text is None) or (result.status_code != 200):
-        'Means an error with the yahoo stuff'
-        return False
-
-    standings_soup = BeautifulSoup(result.text, 'html.parser')
-    teams = standings_soup.findAll('team')
-    for team in teams:
-        _process_team(team)
-    return True
-
-
-def test_standings(request):
-    yahoo_obj = create_session(request)
-    url = "https://fantasysports.yahooapis.com/" \
-          "fantasy/v2/league/{}/standings".format(LEAGUE_ID)
-
-    result = yahoo_obj.request("get", url)
-    results, status_code = result.text, result.status_code
-
-    return result, status_code
-
-
-def update_standings(request):
-    yahoo_obj = create_session(request)
+def update_standings():
+    yahoo_obj = create_session()
     set_standings_not_current()
-    _standings_collection(yahoo_obj)
+    get_new_standings(yahoo_obj)
 
 
 def set_standings_not_current():
@@ -63,7 +30,7 @@ def set_standings_not_current():
         item.save()
 
 
-def _standings_collection(yahoo_obj):
+def get_new_standings(yahoo_obj):
     url = "https://fantasysports.yahooapis.com/" \
           "fantasy/v2/league/{}/standings".format(LEAGUE_ID)
 
@@ -88,18 +55,18 @@ def league_standings(xml_data=None):
     team_list = []
     teams = xml_data.findAll('team')
     for team in teams:
-        team_class, new_team = _process_team(team)
+        team_id, team_name, guid_objects = _process_team_row(team)
 
         standings_class = _process_standings(
-            team_class, team, team_class.team_id
+            team, team_name, guid_objects
         )
 
-        team_list.append(
-            {
-                'team': team_class,
-                'standings': standings_class,
-                'new_team': new_team}
-        )
+        # team_list.append(
+        #     {
+        #         'team': team_class,
+        #         'standings': standings_class,
+        #         'new_team': new_team}
+        # )
     return team_list
 
 
@@ -128,54 +95,53 @@ def _process_team_to_dct(teams):
     return guid_dct
 
 
-
-def _process_team(team_row_xml):
-    new_team = False
-    # get the team id
+def _process_team_row(team_row_xml):
     team_id = team_row_xml.find('team_id').text
-    # Check if exists in the db
-    team_class = YahooTeam.objects.filter(team_id=team_id).first()
-
-    # If it doesn't exist then make a new one -> won't return None if it exist
-    if team_class is None:
-        new_team = True
-        team_class = YahooTeam()
-
-    team_class.team_id = team_row_xml.find('team_id').text
-    team_class.team_name = team_row_xml.find('name').text
-    team_class.logo_url = team_row_xml.find('team_logo').find('url').text
-
-    manager = team_row_xml.find('manager')
-    team_class.manager_name = manager.find('nickname').text
-    team_class.manager_email = manager.find('email').text
-    team_class.manager_guid = manager.find('guid').text
-
-    team_class.save()
-
-    return [team_class, new_team]
+    team_name = team_row_xml.find('name').text
+    guids = _get_managers(team_row_xml)
+    return team_id, team_name, guids
 
 
-def _process_standings(team_class, team_row_xml, team_id):
+def _get_managers(team_row_xml):
+    guid_objects = []
+    for manager in team_row_xml.findAll('manager'):
+        manager_guid = manager.find('guid').text
+        manager_name = manager.find('nickname').text
+
+        guid_obj = YahooGUID.objects.filter(yahoo_guid__contains=manager_guid)
+        if len(guid_obj) == 0:
+            guid_obj = YahooGUID()
+            guid_obj.yahoo_guid = manager_guid
+            guid_obj.manager_name = manager_name
+            guid_obj.save()
+        else:
+            guid_obj = guid_obj[0]
+        guid_objects.append(guid_obj)
+    return guid_objects
+
+
+def _process_standings(team_row_xml, team_name, guid_objects):
     standings_class = YahooStanding()
 
-    standings_class.team = team_class
+    standings_class.team_name = team_name
+    # standings_class.yahoo_guid = guid_objects
 
     standings_class.rank = _process_rank(team_row_xml)
 
     standings_class = _process_team_stats(standings_class, team_row_xml)
     standings_class = _process_team_points(standings_class, team_row_xml)
 
-    starting_week = datetime.strptime(
-        "2018-10-03 00:00:00.000000", "%Y-%m-%d %H:%M:%S.%f"
-    )
+    starting_week = STARTING_WEEK
+
     standings_class.standings_week = math.floor(
         ((datetime.utcnow() - starting_week).days / 7)
     )
 
     standings_class.current_standings = True
-
     standings_class.save()
 
+    for guid_obj in guid_objects:
+        standings_class.yahoo_guid.add(guid_obj)
     return standings_class
 
 

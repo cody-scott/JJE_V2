@@ -26,5 +26,5 @@ urlpatterns = [
 
     url(r'', include('JJE_Main.urls'), name='main'),
     url(r'oauth/', include('Yahoo_Authentication.urls'), name='Yahoo_Authentication'),
-
+    url(r'standings/', include('JJE_Standings.urls'), name='JJE_Standings'),
 ]

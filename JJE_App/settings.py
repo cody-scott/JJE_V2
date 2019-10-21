@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 from dotenv import load_dotenv
 
+import datetime
 import dj_database_url
 import os
 # load environment features from .env file
@@ -20,6 +21,9 @@ load_dotenv()
 SITE_ID = 1
 
 LEAGUE_ID = os.getenv("league_id")
+STARTING_WEEK = datetime.datetime.strptime(
+    os.getenv('starting_week'), "%Y-%m-%d"
+)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -64,6 +68,7 @@ INSTALLED_APPS = [
     # JJE Applications
     'JJE_Main.apps.JJEMainConfig',
     'Yahoo_Authentication.apps.YahooAuthenticationConfig',
+    'JJE_Standings.apps.JJEStandingsConfig',
 ]
 
 MIDDLEWARE = [

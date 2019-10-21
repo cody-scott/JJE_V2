@@ -6,7 +6,7 @@ from JJE_Standings.models import YahooStanding
 
 class StandingsAdmin(admin.ModelAdmin):
     list_display = [
-        'team',
+        'team_name',
         'rank',
         'stat_point_total',
         'current_standings',

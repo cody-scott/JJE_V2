@@ -8,16 +8,18 @@ from django.dispatch.dispatcher import receiver
 class YahooGUID(models.Model):
     date_created = models.DateTimeField(auto_now=True)
     yahoo_guid = models.CharField(max_length=150)
+    manager_name = models.CharField(max_length=150)
+
+    def __str__(self):
+        return "<id: {}>".format(self.manager_name)
 
 
 class YahooStanding(models.Model):
     """Weekly standings from Yahoo"""
     date_created = models.DateTimeField(auto_now=True)
 
-    # this is the yahoo guid
-    # team = models.ForeignKey(YahooTeam, on_delete=models.SET_NULL, null=True)
-
     yahoo_guid = models.ManyToManyField(YahooGUID)
+
     team_name = models.CharField(max_length=50)
 
     rank = models.IntegerField()
@@ -60,7 +62,7 @@ class YahooStanding(models.Model):
     current_standings = models.BooleanField(default=False)
 
     def __str__(self):
-        return "<id: {}>".format(self.team)
+        return "<id: {}>".format(self.team_name)
 
     class Meta:
         ordering = ['current_standings', 'rank']
