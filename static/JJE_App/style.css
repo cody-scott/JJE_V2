@@ -1,0 +1,223 @@
+.padded {
+    padding-bottom: 5px;
+}
+
+.navbar {
+    display: none;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+.padding-header {
+    padding-top: 20px;
+}
+
+/*.rules_text_area {*/
+    /*width: 100%;*/
+    /*min-width: 250px;*/
+    /*min-height: 300px;*/
+/*}*/
+
+.newclaim_btn {
+    background-color: #d6fad3;
+    color: #222222;
+    border-color: #555555;
+
+}
+
+@media (min-width: 100px) {
+
+    .claim_form {
+        margin-bottom: 0;
+    }
+
+    /*ul.nav {*/
+    /*width:100%;*/
+    /*margin:0 auto;*/
+    /*padding:0;*/
+    /*list-style:none;*/
+    /*text-align:center;*/
+    /*font-family: sans-serif;*/
+    /*}*/
+
+    .nav li {
+        display:inline-block;
+        /*width:25%;*/
+        margin:0;
+        padding:0;
+    }
+    .nav a {
+        line-height: 6.5rem;
+        font-size: 11px;
+        font-weight: 300;
+        letter-spacing: .1rem;
+        color: #222;
+        text-decoration: none;
+        text-transform: uppercase;
+        text-align:center;
+        margin:0;
+        border-left: 1px solid #fff;
+        border-right: 1px solid #fff;
+        display:block;
+        padding: 0;
+    }
+
+    /*ul.nav li:first-child a{*/
+    /*border:none;*/
+    /*}*/
+
+    /*ul.nav li:last-child a {*/
+    /*border:none;*/
+    /*}​*/
+
+
+    /*.nav a.hover {*/
+    /*color: #33C3F0;*/
+    /*}*/
+
+
+    .new-claim-row {
+        text-align: center;
+    }
+
+    /*input[class=newclaim_btn] {*/
+    /*!*padding-left: 100%;*!*/
+    /*!*padding-right: 100%;*!*/
+    /*width: 75%;*/
+    /*background-color: #d6fad3;*/
+    /*}*/
+
+    .newclaim_btn {
+        /*padding-left: 500px;*/
+        /*padding-right: 100%;*/
+        width: 75%;
+        /*background-color: #d6fad3;*/
+        /*color: #222222;*/
+        /*border-color: #555555;*/
+
+    }
+
+
+    .submitclaim_btn {
+        width: 200px;
+        background-color: #d6fad3;
+        border-color: #555555;
+        color: #222222;
+    }
+
+    .overclaim_btn {
+        background-color: #d4e7fa;
+        /*width: 50%;*/
+        /*min-width: 150px;*/
+        width: 200px;
+        border-color: #555555;
+        color: #222222;
+    }
+
+    .cancel_btn {
+        background-color: #e7c3c3;
+        width: 200px;
+        border-color: #555555;
+        color: #222222;
+    }
+
+    .return_btn {
+        /*background-color: #e7c3c3;*/
+        width: 200px;
+        /*border-color: #555555;*/
+        /*color: #222222;*/
+    }
+
+    input[class=claim_tbx], select[class=claim_cbx] {
+        width: 85%;
+        min-width: 260px;
+    }
+
+    textarea[class=claim_message_tbx] {
+        width: 85%;
+        min-width: 260px;
+    }
+
+    .hr_top {
+        margin-top: 5px;
+    }
+
+    .colwidth {
+        width: 25%;
+    }
+
+    .standings-row:nth-child(even) {
+        background-color: #ededed;
+    }
+
+    .imgclass {
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+    }
+
+    .maxvh {
+        height: 70vh;
+    }
+
+}
+
+@media (min-width: 600px) {
+    /*.navbar-link {*/
+    /*text-transform: uppercase;*/
+    /*font-size: 12px;*/
+    /*font-weight: 600;*/
+    /*letter-spacing: .2rem;*/
+    /*margin-right: 35px;*/
+    /*text-decoration: none;*/
+    /*line-height: 6.5rem;*/
+    /*color: #222;*/
+    /*}*/
+
+    .newclaim_btn {
+        /*padding-left: 500px;*/
+        /*padding-right: 100%;*/
+        width: 50%;
+
+
+    }
+
+    .nav a {
+        line-height: 6.5rem;
+        font-size: 15px;
+        font-weight: 300;
+        letter-spacing: .2rem;
+        color: #222;
+        text-decoration: none;
+        text-transform: uppercase;
+        text-align:center;
+        margin:0;
+        border-left: 1px solid #fff;
+        border-right: 1px solid #fff;
+        display:block;
+    }
+
+}
+
+@media (min-width: 550px) {
+
+    .colwidth {
+        width: inherit;
+    }
+
+    input[class=claim_tbx], select[class=claim_cbx] {
+        width: 60%;
+        min-width: 260px;
+    }
+
+    textarea[class=claim_message_tbx] {
+        width: 60%;
+        min-width: 260px;
+    }
+
+}
+
+
+

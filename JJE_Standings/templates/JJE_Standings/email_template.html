@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<style>
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 35%;
+        border: 2px solid black;
+    }
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    tr:nth-child(even) {
+        background-color: #dddddd;
+    }
+    td.imgc {
+        border-left: 2px solid transparent;
+    }
+    .imgclass {
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+    }
+</style>
+<body>
+<table style="font-family: arial, sans-serif;border-collapse: collapse;width: 35%;border: 2px solid black;">
+    <tr>
+        <th style="border: 1px solid #dddddd;text-align: left;padding: 8px;">Rank</th>
+        <th colspan="2" style="border: 1px solid #dddddd;text-align: left;padding: 8px;">Team</th>
+        <th style="border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Points</th>
+    </tr>
+    {% for item in DATA %}
+        <tr>
+            <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;"> {{ item.2 }}</td>
+            <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;"> {{ item.1 }}</td>
+            <td class="imgc" style="border: 1px solid #dddddd;text-align: left;padding: 8px;border-left: 2px solid transparent;"> <img class="imgclass" src="{{ item.4 }}" style="border-radius: 50%;width: 50px;height: 50px;"></td>
+            <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;"> {{ item.3 }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<br><br>
+{{ DATETIME }}
+<br><br>
+</body>
+</html>

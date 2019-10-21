@@ -1,0 +1,4 @@
+sharedstatic/JJE_App/charting/* linguist-vendored
+sharedstatic/JJE_App/javascript_libs/* linguist-vendored
+sharedstatic/JJE_App/skeleton/* linguist-vendored
+JJE_Standings/tests/*.html linguist-vendored

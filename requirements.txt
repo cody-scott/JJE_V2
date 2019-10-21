@@ -1,0 +1,12 @@
+django
+django-allauth
+djangorestframework_simplejwt
+whitenoise
+django-widget-tweaks
+djangorestframework
+dj_database_url
+python-dotenv
+gunicorn
+django-widget_tweaks
+psycopg2-binary
+beautifulsoup4
