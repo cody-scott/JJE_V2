@@ -14,12 +14,13 @@ from dotenv import load_dotenv
 import datetime
 import dj_database_url
 import os
-# load environment features from .env file
 
+# load environment features from .env file
 load_dotenv()
 
 SITE_ID = 1
 
+# JJE League Info
 LEAGUE_ID = os.getenv("league_id")
 STARTING_WEEK = datetime.datetime.strptime(
     os.getenv('starting_week'), "%Y-%m-%d"
