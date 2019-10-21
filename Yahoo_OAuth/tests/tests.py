@@ -1,5 +1,5 @@
 from django.test import TestCase
-from Yahoo_Authentication.models import UserToken
+from Yahoo_OAuth.models import UserToken
 from datetime import timedelta
 # Create your tests here.
 

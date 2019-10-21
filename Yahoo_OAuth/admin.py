@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from Yahoo_Authentication.models import UserToken
+from Yahoo_OAuth.models import UserToken
 
 
 class UserTokenAdmin(admin.ModelAdmin):

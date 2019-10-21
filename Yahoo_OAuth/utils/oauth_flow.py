@@ -3,7 +3,7 @@ from JJE_App.settings import client_id, client_secret
 from requests_oauthlib import OAuth2Session
 from django.shortcuts import redirect
 
-from Yahoo_Authentication.models import UserToken
+from Yahoo_OAuth.models import UserToken
 
 import os
 

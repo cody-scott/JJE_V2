@@ -66,9 +66,13 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
 
+    # rest framework
+    'rest_framework',
+    'django_filters',
+
     # JJE Applications
     'JJE_Main.apps.JJEMainConfig',
-    'Yahoo_Authentication.apps.YahooAuthenticationConfig',
+    'Yahoo_OAuth.apps.YahooAuthenticationConfig',
     'JJE_Standings.apps.JJEStandingsConfig',
 ]
 
@@ -104,12 +108,16 @@ WSGI_APPLICATION = 'JJE_App.wsgi.application'
 
 
 # Database
+# TODO set to SQL lite for development, but should be changed to postgres
 DATABASES = {
-    'default': {}
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'jje_v2.sqlite3')
+    }
 }
 
-db_from_env = dj_database_url.config(conn_max_age=500)
-DATABASES['default'].update(db_from_env)
+# db_from_env = dj_database_url.config(conn_max_age=500)
+# DATABASES['default'].update(db_from_env)
 
 # Authentication Data
 LOGIN_REDIRECT_URL = 'index'
@@ -177,3 +185,9 @@ client_id = os.getenv("client_id")
 client_secret = os.getenv("client_secret")
 
 EMAIL_PORT = 587
+
+# rest config
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}

@@ -10,3 +10,4 @@ gunicorn
 django-widget_tweaks
 psycopg2-binary
 beautifulsoup4
+django-filter

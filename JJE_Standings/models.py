@@ -1,26 +1,24 @@
 from django.db import models
 
-from django.db.models.signals import pre_save
-from django.contrib.auth.models import User
-from django.dispatch.dispatcher import receiver
 
-
-class YahooGUID(models.Model):
-    date_created = models.DateTimeField(auto_now=True)
-    yahoo_guid = models.CharField(max_length=150)
-    manager_name = models.CharField(max_length=150)
+class YahooTeam(models.Model):
+    team_id = models.CharField(max_length=10)
+    team_name = models.CharField(max_length=50)
+    logo_url = models.TextField(blank=True)
 
     def __str__(self):
-        return "<id: {}>".format(self.manager_name)
+        return self.team_name
+
+    class Meta:
+        verbose_name = 'Yahoo Team'
+        verbose_name_plural = 'Yahoo Teams'
 
 
 class YahooStanding(models.Model):
     """Weekly standings from Yahoo"""
     date_created = models.DateTimeField(auto_now=True)
 
-    yahoo_guid = models.ManyToManyField(YahooGUID)
-
-    team_name = models.CharField(max_length=50)
+    yahoo_team = models.ForeignKey(YahooTeam, default=None, blank=True, null=True, on_delete=models.SET_NULL, related_name='standings')
 
     rank = models.IntegerField()
     stat_point_total = models.FloatField()
@@ -62,10 +60,27 @@ class YahooStanding(models.Model):
     current_standings = models.BooleanField(default=False)
 
     def __str__(self):
-        return "<id: {}>".format(self.team_name)
+        return "<id: {}>".format(self.yahoo_team)
 
     class Meta:
         ordering = ['current_standings', 'rank']
+        verbose_name = 'Yahoo Standing'
+        verbose_name_plural = 'Yahoo Standings'
+
+
+class YahooGUID(models.Model):
+    date_created = models.DateTimeField(auto_now=True)
+    yahoo_guid = models.CharField(max_length=150)
+    manager_name = models.CharField(max_length=150)
+
+    yahoo_team = models.ManyToManyField(YahooTeam)
+
+    def __str__(self):
+        return "<id: {}>".format(self.manager_name)
+
+    class Meta:
+        verbose_name = 'Yahoo GUID'
+        verbose_name_plural = 'Yahoo GUIDs'
 
 
 class StandingsRequestHistory(models.Model):
@@ -73,3 +88,4 @@ class StandingsRequestHistory(models.Model):
 
     class Meta:
         ordering = ['date_created']
+

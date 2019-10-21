@@ -1,27 +1,28 @@
-from JJE_Standings.models import YahooStanding, YahooGUID
-
-from Yahoo_Authentication.utils.oauth_flow import refresh_user_token, create_oauth_session
-from Yahoo_Authentication.models import UserToken
+from JJE_Standings.models import YahooStanding, YahooGUID, YahooTeam
 
 from bs4 import BeautifulSoup
 from datetime import datetime
 import math
 
-from JJE_App.settings import LEAGUE_ID, STARTING_WEEK
+from JJE_App.settings import STARTING_WEEK
+
+from JJE_App.settings import BASE_DIR
+import os
+
+from Yahoo_OAuth.utils.yahoo_requests import get_standings
 
 
-def create_session():
-    token = UserToken.objects.get(standings_token=True)
-    token = refresh_user_token(token)
-    oauth = create_oauth_session(_client_id=token.client_id,
-                                 token=token.access_token)
-    return oauth
+def _get_standings_local():
+    # todo remove this
+    with open(os.path.join(BASE_DIR, 'JJE_Standings/tests/data.html'), 'r') as fl:
+        return fl.read(), 200
 
 
 def update_standings():
-    yahoo_obj = create_session()
+    new_standings, status_code = _get_standings_local()
+    # new_standings, status_code = get_standings()
     set_standings_not_current()
-    get_new_standings(yahoo_obj)
+    process_new_standings(new_standings)
 
 
 def set_standings_not_current():
@@ -30,76 +31,45 @@ def set_standings_not_current():
         item.save()
 
 
-def get_new_standings(yahoo_obj):
-    url = "https://fantasysports.yahooapis.com/" \
-          "fantasy/v2/league/{}/standings".format(LEAGUE_ID)
-
-    result = yahoo_obj.request("get", url)
-    results, status_code = result.text, result.status_code
-    if (result.text is None) or (result.status_code != 200):
-        # 'Means an error with the yahoo stuff'
-        print("Error with yahoo")
-        return False
-
-    standings_soup = BeautifulSoup(result.text, 'html.parser')
+def process_new_standings(results):
+    standings_soup = BeautifulSoup(results, 'html.parser')
     team_list = league_standings(standings_soup)
-
     return True
 
 
 def league_standings(xml_data=None):
     """
-    Pass the xmlData in AS a beautiful soup object
+    Pass the xmlData in as a beautiful soup object
     team_list is a series of model objects that can be saved on return
     """
     team_list = []
     teams = xml_data.findAll('team')
     for team in teams:
-        team_id, team_name, guid_objects = _process_team_row(team)
+        team_obj = _process_team_row(team)
 
         standings_class = _process_standings(
-            team, team_name, guid_objects
+            team, team_obj
         )
-
-        # team_list.append(
-        #     {
-        #         'team': team_class,
-        #         'standings': standings_class,
-        #         'new_team': new_team}
-        # )
     return team_list
-
-
-def _process_team_to_dct(teams):
-    guid_dct = {}
-    for team in teams:
-
-        team_id = team.find('team_id').text
-        team_name = team.find('name').text
-        logo_url = team.find('team_logo').find('url').text
-        manager = team.find('manager')
-        manager_name = manager.find('nickname').text
-        manager_email = manager.find('email').text
-        manager_guid = manager.find('guid').text
-
-        x = guid_dct.get(manager_guid, [])
-        x.append({
-            'team_id': team_id,
-            'team_name': team_name,
-            'logo_url': logo_url,
-            'manager': manager,
-            'manager_name': manager_name,
-            'manager_email': manager_email
-        })
-        guid_dct[manager_guid] = x
-    return guid_dct
 
 
 def _process_team_row(team_row_xml):
     team_id = team_row_xml.find('team_id').text
     team_name = team_row_xml.find('name').text
-    guids = _get_managers(team_row_xml)
-    return team_id, team_name, guids
+    managers = _get_managers(team_row_xml)
+
+    team_class = YahooTeam.objects.filter(team_id=team_id).first()
+    if team_class is None:
+        team_class = YahooTeam()
+    team_class.team_id = team_row_xml.find('team_id').text
+    team_class.team_name = team_row_xml.find('name').text
+    team_class.logo_url = team_row_xml.find('team_logo').find('url').text
+    team_class.save()
+
+    for manager in managers:
+        manager.yahoo_team.add(team_class)
+
+    return team_class
 
 
 def _get_managers(team_row_xml):
@@ -120,28 +90,23 @@ def _get_managers(team_row_xml):
     return guid_objects
 
 
-def _process_standings(team_row_xml, team_name, guid_objects):
+def _process_standings(team_row_xml, team_obj):
     standings_class = YahooStanding()
 
-    standings_class.team_name = team_name
-    # standings_class.yahoo_guid = guid_objects
-
     standings_class.rank = _process_rank(team_row_xml)
-
     standings_class = _process_team_stats(standings_class, team_row_xml)
     standings_class = _process_team_points(standings_class, team_row_xml)
 
     starting_week = STARTING_WEEK
-
     standings_class.standings_week = math.floor(
         ((datetime.utcnow() - starting_week).days / 7)
     )
 
     standings_class.current_standings = True
+
+    standings_class.yahoo_team = team_obj
     standings_class.save()
 
-    for guid_obj in guid_objects:
-        standings_class.yahoo_guid.add(guid_obj)
     return standings_class
 
 

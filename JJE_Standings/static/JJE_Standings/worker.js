@@ -1,6 +1,6 @@
 var base_url = location["protocol"] + "//" + location["host"] + "/";
-var standings_api = base_url + "api" + "/";
-var current_standings_url = standings_api + "standings/";
+var standings_api = base_url + "standings/api/";
+var current_standings_url = standings_api + "current_standings/";
 var all_standings_url = standings_api + "all_standings/";
 
 var colors = [
@@ -29,7 +29,7 @@ function get_standings() {
             standings_data = process_data(data);
 
             for (var i=0; i<data.length; i++) {
-                var tm = data[i]['team']['team_name'];
+                var tm = data[i]['team_name'];
                 team_colors[tm] = colors[i];
             }
 
@@ -49,25 +49,8 @@ function get_all_standings() {
     )
 }
 
-// var dt;
-// function set_team_colors() {
-//         $.getJSON(
-//         current_standings_url + "?format=json", function(data) {
-//             dt = data;
-//
-//             for (var i=0; i<data.length; i++) {
-//                 var tm = data[i]['team']['team_name'];
-//                 team_colors[tm] = colors[i];
-//             }
-//
-//             load_standings();
-//         }
-//     )
-// }
-
 
 function load_standings() {
-
     get_all_standings();
 }
 
@@ -77,7 +60,7 @@ function process_data(data) {
     var lbl = [];
     for (var i=0; i < data.length; i++) {
         var current_team = data[i];
-        lbl.push(current_team['team']['team_name']);
+        lbl.push(current_team['team_name']);
         dt.push(current_team['stat_point_total'])
     }
     var out_data = {
@@ -106,7 +89,7 @@ function process_all_standings(data) {
 
     for (var i=0; i < data.length; i++) {
         var c_row = data[i];
-        var tm = c_row['team']['team_name'];
+        var tm = c_row['team_name'];
         var standings_week_int = parseInt(c_row["standings_week"]);
         var standings_points_int = parseInt(c_row["stat_point_total"]);
         if (!out_dct[tm]) {
@@ -263,7 +246,6 @@ var chart_loaded = false;
 var is_mobile = false;
 
 $(document).ready(function() {
-
     if( /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
         is_mobile = true;
         resize_checker()
@@ -272,9 +254,5 @@ $(document).ready(function() {
         show_chart();
     }
     get_standings();
-
-    // create_season_chart();
-
     console.log(is_mobile);
-
 });
