@@ -1,27 +1,36 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
+from rest_framework.response import Response
+
 
 from JJE_Standings.api import serializer
 from JJE_Standings.models import YahooStanding, YahooGUID, YahooTeam
 
 
-class YahooGUIDViewSet(viewsets.ModelViewSet):
+# Overall View for GUID -> yahoo team with standings as hyperlink
+class YahooGUIDViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = YahooGUID.objects.all()
     serializer_class = serializer.YahooGUIDSerializer
     filterset_fields = ['yahoo_guid']
 
+    permission_classes = [permissions.IsAuthenticated]
 
-class YahooTeamGUIDViewSetCurrentWeek(viewsets.ModelViewSet):
+
+# Returns GUID -> teams with current weekly rank of that team
+class YahooTeamGUIDViewSetCurrentWeek(viewsets.ReadOnlyModelViewSet):
     queryset = YahooGUID.objects.all()
-    serializer_class = serializer.YahooGUIDSerializer
+    serializer_class = serializer.YahooCurrentGUIDSerializer
 
-    def get_queryset(self):
-        return YahooGUID.objects.filter(
-            yahoo_team__standings__current_standings=True
-        )
+    filterset_fields = (
+        'yahoo_guid',
+    )
 
+    permission_classes = [permissions.IsAuthenticated]
 
-# not returning as expected
-class CurrentStandingsViewSet(viewsets.ModelViewSet):
+from JJE_Standings.api import filters as api_filter
+
+class CurrentStandingsViewSet(viewsets.ReadOnlyModelViewSet):
+    filter_class = api_filter.RankingFilter
+
     queryset = YahooStanding.objects.all()
     serializer_class = serializer.YahooRankSerializer
 
@@ -29,16 +38,32 @@ class CurrentStandingsViewSet(viewsets.ModelViewSet):
         standings_active = YahooStanding.objects.filter(
             current_standings=True
         )
+
         return standings_active
 
 
-class AllStandingsViewSet(viewsets.ModelViewSet):
-    queryset = YahooStanding.objects.all()
-    serializer_class = serializer.YahooRankSerializer
+# returns all standings for each team
+class AllStandingsViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = YahooTeam.objects.all()
+    serializer_class = serializer.YahooTeamAllStandingsSerializer
+
+    def get_queryset(self):
+        qs = YahooTeam.objects.all()
+
+        return qs
+    filterset_fields = (
+        'team_name',
+        'team_id',
+    )
 
 
-class YahooTeamGUIDViewSet(viewsets.ModelViewSet):
+# this view returns the Team -> GUID (for reverse lookups)
+class YahooTeamGUIDViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = YahooTeam.objects.all()
     serializer_class = serializer.YahooTeamtoGUID
+    filterset_fields = (
+        'team_name',
+        'team_id',
+    )
 
-
+    permission_classes = [permissions.IsAuthenticated]

@@ -1,9 +1,16 @@
 from Yahoo_OAuth.utils.oauth_flow import refresh_user_token, create_oauth_session
 from Yahoo_OAuth.models import UserToken
 
-from JJE_App.settings import LEAGUE_ID
-
+from django.conf import settings
 from urllib.parse import urlencode
+
+
+# from JJE_App.settings import BASE_DIR
+# import os
+# def _get_standings_local():
+#     # todo remove this
+#     with open(os.path.join(BASE_DIR, 'JJE_Standings/tests/data.html'), 'r') as fl:
+#         return {'results': fl.read(), 'status_code': 200}
 
 
 def create_session(token):
@@ -13,8 +20,11 @@ def create_session(token):
     return oauth
 
 
-def get_standings():
-    token = UserToken.objects.get(standings_token=True)
+def get_standings(request):
+    #
+    # return _get_standings_local()
+    token = request.user.usertoken_set.first()
+    # token = UserToken.objects.get(standings_token=True)
     yahoo_obj = create_session(token)
     return request_standings(yahoo_obj)
 
@@ -27,21 +37,21 @@ def _get_request(yahoo_obj, url):
 
 
 def request_standings(yahoo_obj):
-    url = f"https://fantasysports.yahooapis.com/fantasy/v2/league/{LEAGUE_ID}/standings"
+    url = f"https://fantasysports.yahooapis.com/fantasy/v2/league/{settings.LEAGUE_ID}/standings"
     return _get_request(yahoo_obj, url)
 
 
 def request_roster(yahoo_obj, team_id):
-    url = f"https://fantasysports.yahooapis.com/fantasy/v2/team/{LEAGUE_ID}.t.{team_id}/roster/players"
+    url = f"https://fantasysports.yahooapis.com/fantasy/v2/team/{settings.LEAGUE_ID}.t.{team_id}/roster/players"
     return _get_request(yahoo_obj, url)
 
 
 def request_players(yahoo_obj, player_dict):
     player_args = urlencode(player_dict).replace("&", ",")
-    url = f"https://fantasysports.yahooapis.com/fantasy/v2/league/{LEAGUE_ID}/players;{player_args}/stats"
+    url = f"https://fantasysports.yahooapis.com/fantasy/v2/league/{settings.LEAGUE_ID}/players;{player_args}/stats"
     return _get_request(yahoo_obj, url)
 
 
 def request_player(yahoo_obj, player_id):
-    url = f"https://fantasysports.yahooapis.com/fantasy/v2/league/{LEAGUE_ID}/players;player_keys=nhl.p.{player_id}/stats"
+    url = f"https://fantasysports.yahooapis.com/fantasy/v2/league/{settings.LEAGUE_ID}/players;player_keys=nhl.p.{player_id}/stats"
     return _get_request(yahoo_obj, url)

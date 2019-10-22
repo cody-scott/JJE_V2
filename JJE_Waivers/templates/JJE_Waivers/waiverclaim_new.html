@@ -1,0 +1,150 @@
+{% extends 'JJE_App/_layout.html' %}
+{% load widget_tweaks %}
+{% block title_block %}JJE League - New Claim{% endblock %}
+{% block content %}
+    <div class="container">
+        <form action="" method="post" class="claim_form">{% csrf_token %}
+            <div class="row form-group">
+                <div class="col-md-8">
+                    {{ form.team.errors }}
+                    <label for="{{ form.team.id_for_label }}">Team:</label>
+                    {{ form.team|attr:"class: form-control" }}
+                </div>
+                <hr>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-md-8">
+                    {{ form.add_player.errors }}
+                    <label for="{{ form.add_player.id_for_label }}">Add Player:</label>
+                    {{ form.add_player|attr:"class:claim_tbx form-control" }}
+                </div>
+            </div>
+{#            <br>#}
+            <div class="form-group form-check">
+                <div class="row">
+                    <div class="col-lg-2 colwidth ">
+                        {{ form.add_LW.errors }}
+                        {{ form.add_LW|attr:"class:form-check-input"}}
+                        <label for="{{ form.add_LW.id_for_label }}" class="form-check-label">LW</label>
+                    </div>
+                    <div class="col-lg-2 colwidth">
+                        {{ form.add_C.errors }}
+                        {{ form.add_C|attr:"class:form-check-input"}}
+                        <label for="{{ form.add_C.id_for_label }}" class="form-check-label">C</label>
+                    </div>
+                    <div class="col-lg-2 colwidth">
+                        {{ form.add_RW.errors }}
+                        {{ form.add_RW|attr:"class:form-check-input"}}
+                        <label for="{{ form.add_RW.id_for_label }}" class="form-check-label">RW</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-2 colwidth">
+                        {{ form.add_D.errors }}
+                        {{ form.add_D|attr:"class:form-check-input"}}
+                        <label for="{{ form.add_D.id_for_label }}" class="form-check-label">D</label>
+                    </div>
+                    <div class="col-lg-2 colwidth">
+                        {{ form.add_G.errors }}
+                        {{ form.add_G|attr:"class:form-check-input"}}
+                        <label for="{{ form.add_G.id_for_label }}" class="form-check-label">G:</label>
+                    </div>
+                    <div class="col-lg-2 colwidth">
+                        {{ form.add_Util.errors }}
+                        {{ form.add_Util|attr:"class:form-check-input"}}
+                        <label for="{{ form.add_Util.id_for_label }}" class="form-check-label">Util</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-2 colwidth">
+                        {{ form.add_IR.errors }}
+                        {{ form.add_IR|attr:"class:form-check-input"}}
+                        <label for="{{ form.add_IR.id_for_label }}" class="form-check-label">IR</label>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row">
+                <div class="col-md-8 form-group">
+                    {{ form.drop_player.errors }}
+                    <label for="{{ form.drop_player.id_for_label }}">Drop Player:</label>
+                    {{ form.drop_player|attr:"class:claim_tbx form-control" }}
+                </div>
+            </div>
+{#            <br>#}
+            <div class="form-group form-check">
+                <div class="row">
+                    <div class="col-lg-2 colwidth ">
+                        {{ form.drop_LW.errors }}
+                        {{ form.drop_LW|attr:"class:form-check-input"}}
+                        <label for="{{ form.drop_LW.id_for_label }}" class="form-check-label">LW</label>
+                    </div>
+                    <div class="col-lg-2 colwidth">
+                        {{ form.drop_C.errors }}
+                        {{ form.drop_C|attr:"class:form-check-input"}}
+                        <label for="{{ form.drop_C.id_for_label }}" class="form-check-label">C</label>
+                    </div>
+                    <div class="col-lg-2 colwidth">
+                        {{ form.drop_RW.errors }}
+                        {{ form.drop_RW|attr:"class:form-check-input"}}
+                        <label for="{{ form.drop_RW.id_for_label }}" class="form-check-label">RW</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-2 colwidth">
+                        {{ form.drop_D.errors }}
+                        {{ form.drop_D|attr:"class:form-check-input"}}
+                        <label for="{{ form.drop_D.id_for_label }}" class="form-check-label">D</label>
+                    </div>
+                    <div class="col-lg-2 colwidth">
+                        {{ form.drop_G.errors }}
+                        {{ form.drop_G|attr:"class:form-check-input"}}
+                        <label for="{{ form.drop_G.id_for_label }}" class="form-check-label">G</label>
+                    </div>
+                    <div class="col-lg-2 colwidth">
+                        {{ form.drop_Util.errors }}
+                        {{ form.drop_Util|attr:"class:form-check-input"}}
+                        <label for="{{ form.drop_Util.id_for_label }}" class="form-check-label">Util</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-2 colwidth">
+                        {{ form.drop_IR.errors }}
+                        {{ form.drop_IR|attr:"class:form-check-input"}}
+                        <label for="{{ form.drop_IR.id_for_label }}" class="form-check-label">IR</label>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-lg-12 form-group">
+                    {{ form.claim_message.errors }}
+                    <label for="{{ form.claim_message.id_for_label }}">Claim Message:</label>
+                    {{ form.claim_message|attr:"class:claim_message_tbx form-control"}}
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-lg-12">
+                    <input class="submitclaim_btn btn btn-success" type="submit" value="Submit Claim" />
+                </div>
+            </div>
+            <br>
+        </form>
+        <form action="/">
+            <div class="row">
+                <div class="col-lg-12">
+                    <input class="btn btn-light return_btn" type="submit" value="Cancel" />
+                </div>
+            </div>
+        </form>
+
+    </div>
+{% endblock %}

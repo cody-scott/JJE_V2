@@ -1,0 +1,32 @@
+{% extends 'JJE_App/_layout.html' %}
+{% block title_block %}JJE League - Cancel/{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>Cancel claim for <strong>{{ waiverclaim.add_player }}</strong>?</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <form method="post">{% csrf_token %}
+                    <div class="form-group">
+                        <input class="btn btn-danger cancel_btn" type="submit" value="Confirm">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row"></div>
+        <div class="row">
+            <div class="col-lg-12">
+                <form action="/">
+                    <div class="form-group">
+                        <input class="btn btn-light return_btn" type="submit" value="Return Home">
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+{% endblock %}

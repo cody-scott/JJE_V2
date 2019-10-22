@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+<body>
+<div>
+    <h1>Claimee: {{ claim.team.team_name }}</h1>
+    <h2>Add: {{ claim.add_player }}</h2>
+    {% if IR_PLAYER == True %}
+        <h2>Move to IR: {{ claim.drop_player }}</h2>
+    {% else %}
+        <h2>Drop: {{ claim.drop_player }}</h2>
+    {% endif %}
+    {% if claim.claim_message != '' %}
+        <br>
+        <h2>
+            Claim Message:
+        </h2>
+        <a>
+            {{ claim.claim_message }}
+        </a>
+        <br>
+        <br>
+    {% endif %}
+
+    <h3>Claim Start (UTC): {{ claim.claim_start }}</h3>
+    <h3>Claim End (UTC): {{ claim.claim_end_normal }}</h3>
+    <h4>
+        <a href="{{ site.domain }}/waiver_claim/overclaim={{ claim.id }}">
+            Overclaim Link
+        </a>
+    </h4>
+    <h4>
+        <a href="{{ site.domain }}">
+            Claim Site
+        </a>
+    </h4>
+</div>
+</body>
+</html>

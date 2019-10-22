@@ -1,28 +1,33 @@
 from JJE_Standings.models import YahooStanding, YahooGUID, YahooTeam
 
+from django.conf import settings
+
+from django.contrib.sites.models import Site
+
 from bs4 import BeautifulSoup
 from datetime import datetime
 import math
-
-from JJE_App.settings import STARTING_WEEK
-
-from JJE_App.settings import BASE_DIR
-import os
-
-from Yahoo_OAuth.utils.yahoo_requests import get_standings
+import requests
 
 
-def _get_standings_local():
-    # todo remove this
-    with open(os.path.join(BASE_DIR, 'JJE_Standings/tests/data.html'), 'r') as fl:
-        return fl.read(), 200
+def update_standings(token):
+    print(f"token {token}")
 
+    site = Site.objects.first()
 
-def update_standings():
-    # new_standings, status_code = _get_standings_local()
-    res = get_standings()
-    new_standings = res['results']
-    status_code = res['status_code']
+    url = site.domain + "oauth/api/getstandings/"
+    headers = {'Authorization': f'Token {token}'}
+
+    res = requests.get(url, headers=headers)
+
+    if res.status_code != 200:
+        print("Error")
+        print(res.text)
+        return
+
+    yahoo_res = res.json()
+    new_standings = yahoo_res['results']
+    status_code = yahoo_res['status_code']
 
     set_standings_not_current()
     process_new_standings(new_standings)
@@ -100,7 +105,7 @@ def _process_standings(team_row_xml, team_obj):
     standings_class = _process_team_stats(standings_class, team_row_xml)
     standings_class = _process_team_points(standings_class, team_row_xml)
 
-    starting_week = STARTING_WEEK
+    starting_week = settings.STARTING_WEEK
     standings_class.standings_week = math.floor(
         ((datetime.utcnow() - starting_week).days / 7)
     )

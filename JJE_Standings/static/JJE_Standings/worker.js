@@ -1,5 +1,5 @@
 var base_url = location["protocol"] + "//" + location["host"] + "/";
-var standings_api = base_url + "standings/api/";
+var standings_api = base_url + "api/";
 var current_standings_url = standings_api + "current_standings/";
 var all_standings_url = standings_api + "all_standings/";
 
@@ -22,6 +22,7 @@ var team_colors = {};
 var standings_data;
 var all_standings_data;
 var week_labels;
+var raw_as;
 
 function get_standings() {
     $.getJSON(
@@ -43,17 +44,16 @@ function get_standings() {
 function get_all_standings() {
     $.getJSON(
         all_standings_url + "?format=json", function(data) {
+            raw_as = data;
             all_standings_data = process_all_standings(data);
             create_season_chart();
         }
     )
 }
 
-
 function load_standings() {
     get_all_standings();
 }
-
 
 function process_data(data) {
     var dt = [];
@@ -84,49 +84,22 @@ function sortSeasonNumber(a, b) {
 }
 
 function process_all_standings(data) {
-    var out_dct = {};
-    var week_list = [];
-
-    for (var i=0; i < data.length; i++) {
+    var out_data = []
+    for (var i=0; i< data.length; i++) {
         var c_row = data[i];
         var tm = c_row['team_name'];
-        var standings_week_int = parseInt(c_row["standings_week"]);
-        var standings_points_int = parseInt(c_row["stat_point_total"]);
-        if (!out_dct[tm]) {
-            out_dct[tm] = [];
+        var standings = c_row['standings'].sort((a, b) => (a.standings_week > b.standings_week) ? 1: -1);
+
+        var standing_dict = {
+            'label': tm,
+            'borderColor': team_colors[tm],
+            'backgroundColor': team_colors[tm],
+            'fill': false,
+            'data': standings.map((val) => ({"x": "Week " + val.standings_week, "y": val.stat_point_total}))
         }
-        out_dct[tm].push(
-            {x: "Week " + standings_week_int, y: standings_points_int}
-        );
-        if (week_list.indexOf(standings_week_int) < 0) {
-            week_list.push(standings_week_int)
-        }
-        week_list.sort(sortNumber);
+        out_data.push(standing_dict)
     }
-    week_labels = week_list.map(function(x) { return ["Week " + x]});
-    var values = [];
-    var tmp_keys = [];
-
-    //gets a list of the team names
-    for (var key in out_dct) {
-        tmp_keys.push(key);
-    }
-    //this sorts the teams to alphabetical
-    tmp_keys.sort();
-
-    for (var i=0; i<tmp_keys.length; i++) {
-        var key = tmp_keys[i];
-        var tmp = {
-            label: key,
-            data: out_dct[key].sort(sortSeasonNumber),
-            fill: false,
-            borderColor: team_colors[key],
-            backgroundColor: team_colors[key]
-        };
-        values.push(tmp);
-    }
-
-    return values;
+    return out_data;
 }
 
 var myChart;
@@ -187,8 +160,6 @@ function create_season_chart() {
         }
     });
 }
-
-
 
 function check_chart_hidden() {
     var hidden = $(".canvas_column").attr('hidden');
