@@ -73,7 +73,7 @@ class YahooGUID(models.Model):
     yahoo_guid = models.CharField(max_length=150)
     manager_name = models.CharField(max_length=150)
 
-    yahoo_team = models.ManyToManyField(YahooTeam)
+    yahoo_team = models.ManyToManyField(YahooTeam, related_name='guid_teams')
 
     def __str__(self):
         return "<id: {}>".format(self.manager_name)
@@ -88,4 +88,5 @@ class StandingsRequestHistory(models.Model):
 
     class Meta:
         ordering = ['date_created']
+
 

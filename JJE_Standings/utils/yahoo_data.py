@@ -19,8 +19,11 @@ def _get_standings_local():
 
 
 def update_standings():
-    new_standings, status_code = _get_standings_local()
-    # new_standings, status_code = get_standings()
+    # new_standings, status_code = _get_standings_local()
+    res = get_standings()
+    new_standings = res['results']
+    status_code = res['status_code']
+
     set_standings_not_current()
     process_new_standings(new_standings)
 

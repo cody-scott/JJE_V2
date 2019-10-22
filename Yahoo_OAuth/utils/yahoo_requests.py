@@ -16,7 +16,7 @@ def create_session(token):
 def get_standings():
     token = UserToken.objects.get(standings_token=True)
     yahoo_obj = create_session(token)
-    request_standings(yahoo_obj)
+    return request_standings(yahoo_obj)
 
 
 def _get_request(yahoo_obj, url):

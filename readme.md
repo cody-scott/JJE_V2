@@ -16,3 +16,9 @@
     # For local development
     DJANGO_SETTINGS_MODULE="JJE_App.settings"
     DEBUG="TRUE"
+    
+    
+    
+## Start chrome
+
+    /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --ignore-certificate-errors &> /dev/null &
