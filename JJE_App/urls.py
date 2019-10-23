@@ -10,15 +10,18 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-
 from rest_framework.routers import DefaultRouter, SimpleRouter
 router = DefaultRouter()
+
+from JJE_Main.urls import router as main_router
+router.registry.extend(main_router.registry)
 
 from JJE_Standings.urls import router as standings_router
 router.registry.extend(standings_router.registry)
 
-from JJE_Waivers.urls import router as waivers_router
-router.registry.extend(waivers_router.registry)
+#
+# from JJE_Waivers.urls import router as waivers_router
+# router.registry.extend(waivers_router.registry)
 
 # from Yahoo_OAuth.urls import router as yahoo_oauth_router
 # router.registry.extend(yahoo_oauth_router.registry)

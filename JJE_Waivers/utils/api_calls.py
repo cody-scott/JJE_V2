@@ -14,7 +14,7 @@ def get_users_teams_waivers_request(request):
 def get_users_teams_waivers(auth_key, guid):
     site = Site.objects.first()
     headers = {'Authorization': f'Token {auth_key}'}
-    url = os.path.join(site.domain, f"waivers/api/waivers_guid/?yahoo_guid={guid}")
+    url = os.path.join(site.domain, f"api/guid/?yahoo_guid={guid}")
 
     res = requests.get(url, headers=headers, verify=settings.VERIFY_REQUEST)
 
@@ -29,7 +29,7 @@ def get_users_teams_waivers(auth_key, guid):
 def get_overclaim_teams(request, team_list):
     # team_list is list of [{'team_id': X, 'team_name': Y}]
 
-    id_list = ",".join([val['team_id'] for val in team_list])
+    id_list = ",".join([val['id'] for val in team_list])
 
     site = Site.objects.first()
     headers = {'Authorization': f'Token {request.user.auth_token.key}'}
@@ -40,5 +40,5 @@ def get_overclaim_teams(request, team_list):
     url = os.path.join(site.domain, f"standings/api/current_standings/?rank_lt={lowest_team_rank}")
     res = requests.get(url, headers=headers, verify=settings.VERIFY_REQUEST)
 
-    overclaim_teams = [t.get('team_id') for t in res.json()]
+    overclaim_teams = [t.get('id') for t in res.json()]
     return overclaim_teams

@@ -1,4 +1,4 @@
-from JJE_Standings.models import YahooStanding, YahooGUID, YahooTeam
+from JJE_Standings.models import YahooStanding
 
 from django.conf import settings
 
@@ -11,14 +11,12 @@ import requests
 import os
 
 
-def update_standings(token):
-    print(f"token {token}")
-
+def query_standings(token):
     site = Site.objects.first()
 
     url = os.path.join(site.domain, "oauth/api/getstandings/")
+    url = url.replace("\\", "/")
     headers = {'Authorization': f'Token {token}'}
-
     res = requests.get(url, headers=headers, verify=settings.VERIFY_REQUEST)
 
     if res.status_code != 200:
@@ -26,12 +24,39 @@ def update_standings(token):
         print(res.text)
         return
 
-    yahoo_res = res.json()
+    return res.json()
+
+
+def query_team(token):
+    site = Site.objects.first()
+
+    url = os.path.join(site.domain, "api/teams/")
+    url = url.replace("\\", "/")
+    headers = {'Authorization': f'Token {token}'}
+    res = requests.get(url, headers=headers, verify=settings.VERIFY_REQUEST)
+    res_json = res.json()
+
+    dc = {}
+    for i in res_json:
+        dc[i['team_id']] = {
+            'id': i['id'],
+            'team_name': i['team_name']
+        }
+    return dc
+
+
+def update_standings(token):
+    print(f"token {token}")
+
+    yahoo_res = query_standings(token)
     new_standings = yahoo_res['results']
     status_code = yahoo_res['status_code']
 
+    teams = query_team(token)
+
     set_standings_not_current()
-    process_new_standings(new_standings)
+
+    process_new_standings(new_standings, teams)
 
 
 def set_standings_not_current():
@@ -40,21 +65,13 @@ def set_standings_not_current():
         item.save()
 
 
-def process_new_standings(results):
+def process_new_standings(results, teams_json):
     standings_soup = BeautifulSoup(results, 'html.parser')
-    team_list = league_standings(standings_soup)
-    return True
 
-
-def league_standings(xml_data=None):
-    """
-    Pass the xmlData in as a beautiful soup object
-    team_list is a series of model objects that can be saved on return
-    """
     team_list = []
-    teams = xml_data.findAll('team')
+    teams = standings_soup.findAll('team')
     for team in teams:
-        team_obj = _process_team_row(team)
+        team_obj = _process_team_row(team, teams_json)
 
         standings_class = _process_standings(
             team, team_obj
@@ -62,41 +79,10 @@ def league_standings(xml_data=None):
     return team_list
 
 
-def _process_team_row(team_row_xml):
+def _process_team_row(team_row_xml, team_json):
     team_id = team_row_xml.find('team_id').text
-    team_name = team_row_xml.find('name').text
-    managers = _get_managers(team_row_xml)
-
-    team_class = YahooTeam.objects.filter(team_id=team_id).first()
-    if team_class is None:
-        team_class = YahooTeam()
-    team_class.team_id = team_row_xml.find('team_id').text
-    team_class.team_name = team_row_xml.find('name').text
-    team_class.logo_url = team_row_xml.find('team_logo').find('url').text
-    team_class.save()
-
-    for manager in managers:
-        manager.yahoo_team.add(team_class)
-
-    return team_class
-
-
-def _get_managers(team_row_xml):
-    guid_objects = []
-    for manager in team_row_xml.findAll('manager'):
-        manager_guid = manager.find('guid').text
-        manager_name = manager.find('nickname').text
-
-        guid_obj = YahooGUID.objects.filter(yahoo_guid__contains=manager_guid)
-        if len(guid_obj) == 0:
-            guid_obj = YahooGUID()
-            guid_obj.yahoo_guid = manager_guid
-            guid_obj.manager_name = manager_name
-            guid_obj.save()
-        else:
-            guid_obj = guid_obj[0]
-        guid_objects.append(guid_obj)
-    return guid_objects
+    js = team_json[team_id]
+    return js['id']
 
 
 def _process_standings(team_row_xml, team_obj):
@@ -113,7 +99,7 @@ def _process_standings(team_row_xml, team_obj):
 
     standings_class.current_standings = True
 
-    standings_class.yahoo_team = team_obj
+    standings_class.yahoo_team_id = team_obj
     standings_class.save()
 
     return standings_class

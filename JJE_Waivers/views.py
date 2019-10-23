@@ -10,7 +10,7 @@ from django.views.generic.edit import CreateView
 from django.contrib import messages
 
 
-from JJE_Waivers.models import WaiverClaim, YahooTeam
+from JJE_Waivers.models import WaiverClaim
 from JJE_Waivers.utils import show_oauth_link
 from JJE_Waivers.utils import api_calls
 
@@ -53,7 +53,7 @@ class IndexView(ListView):
 
         user_teams = []
         overclaim_teams = []
-        if not self.request.user.is_anonymous:
+        if (not self.request.user.is_anonymous) and (oauth_display is False):
             # query for users teams via api using GUID
 
             user_teams = api_calls.get_users_teams_waivers_request(self.request)
@@ -88,9 +88,9 @@ class WaiverClaimCreate(CreateView):
         ids = api_calls.get_users_teams_waivers_request(self.request)
         usr_teams = [v.get('id') for v in ids]
 
-        frm.fields['team'].queryset = YahooTeam.objects.filter(
-            id__in=usr_teams
-        )
+        # frm.fields['team'].queryset = YahooTeam.objects.filter(
+        #     id__in=usr_teams
+        # )
         return frm
 
     def get_initial(self):

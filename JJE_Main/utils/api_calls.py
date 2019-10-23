@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.sites.models import Site
 
-
+from JJE_Main.models import YahooGUID, YahooTeam
 
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -10,14 +10,11 @@ import requests
 import os
 
 
-def deactivate_teams():
-    pass
-
-
-def get_user_teams(request):
+def update_teams(request):
     site = Site.objects.first()
 
-    url = os.path.join(site.domain, "oauth/api/getuserteams/")
+    url = os.path.join(site.domain, "oauth/api/getteams/")
+    url = url.replace("\\", "/")
     headers = {'Authorization': f'Token {request.user.auth_token.key}'}
 
     res = requests.get(url, headers=headers, verify=settings.VERIFY_REQUEST)
@@ -26,7 +23,7 @@ def get_user_teams(request):
     team_xml = yahoo_res['results']
     status_code = yahoo_res['status_code']
 
-    team_xml = BeautifulSoup(team_xml)
+    team_xml = BeautifulSoup(team_xml, 'html.parser')
     teams = team_xml.find_all('team')
     for team in teams:
         team_obj = _process_team_row(team)

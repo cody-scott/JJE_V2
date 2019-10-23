@@ -3,24 +3,13 @@ from django.utils import timezone
 from django.urls import reverse
 import datetime
 
-
-class YahooTeam(models.Model):
-    team_id = models.CharField(max_length=10)
-    team_name = models.CharField(max_length=50)
-    logo_url = models.TextField(blank=True)
-
-    active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.team_name
-
-    class Meta:
-        verbose_name = 'Yahoo Team'
-        verbose_name_plural = 'Yahoo Teams'
+from JJE_Main.models import YahooTeam
 
 
 class WaiverClaim(models.Model):
-    team = models.ForeignKey(YahooTeam, on_delete=models.SET_NULL, null=True)
+    # yahoo_team_uid = models.IntegerField()
+    yahoo_team = models.ForeignKey(YahooTeam, default=None, blank=True, null=True, on_delete=models.SET_NULL,
+                      related_name='waiver_team')
 
     claim_start = models.DateTimeField(default=timezone.now)
 
@@ -115,18 +104,3 @@ class WaiverClaim(models.Model):
 
     class Meta:
         ordering = ['-claim_start']
-
-
-class YahooGUID(models.Model):
-    date_created = models.DateTimeField(auto_now=True)
-    yahoo_guid = models.CharField(max_length=150)
-    manager_name = models.CharField(max_length=150)
-
-    yahoo_team = models.ManyToManyField(YahooTeam, related_name='guid_teams')
-
-    def __str__(self):
-        return "<id: {}>".format(self.manager_name)
-
-    class Meta:
-        verbose_name = 'Yahoo GUID'
-        verbose_name_plural = 'Yahoo GUIDs'

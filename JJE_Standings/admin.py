@@ -1,8 +1,11 @@
 from django.contrib import admin
-from JJE_Standings.models import YahooStanding, YahooGUID, YahooTeam
+from JJE_Standings.models import YahooStanding
 
 
 class StandingsAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        return [f.name for f in self.model._meta.fields if f.name not in ['current_standings']]
+
     list_display = [
         'yahoo_team',
         'rank',
@@ -14,24 +17,5 @@ class StandingsAdmin(admin.ModelAdmin):
     list_per_page = 12
 
 
-class TeamAdmin(admin.ModelAdmin):
-    readonly_fields = ('team_id', 'team_name', 'logo_url')
-    fields = ('team_id', 'team_name', 'logo_url')
-    list_display = [
-        'team_name',
-    ]
-
-
-class YahooGUIDAdmin(admin.ModelAdmin):
-    readonly_fields = ('manager_name', 'yahoo_guid')
-    fields = ('manager_name', 'yahoo_guid', 'yahoo_team')
-
-    list_display = [
-        'manager_name',
-        'yahoo_guid',
-    ]
-
-
 admin.site.register(YahooStanding, StandingsAdmin)
-admin.site.register(YahooTeam, TeamAdmin)
-admin.site.register(YahooGUID, YahooGUIDAdmin)
+

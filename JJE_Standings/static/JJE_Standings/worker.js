@@ -88,7 +88,7 @@ function process_all_standings(data) {
     for (var i=0; i< data.length; i++) {
         var c_row = data[i];
         var tm = c_row['team_name'];
-        var standings = c_row['standings'].sort((a, b) => (a.standings_week > b.standings_week) ? 1: -1);
+        var standings = c_row['standing_team'].sort((a, b) => (a.standings_week > b.standings_week) ? 1: -1);
 
         var standing_dict = {
             'label': tm,

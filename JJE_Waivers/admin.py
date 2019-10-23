@@ -1,24 +1,7 @@
 from django.contrib import admin
 
-from JJE_Waivers.models import YahooTeam, YahooGUID, WaiverClaim
+from JJE_Waivers.models import WaiverClaim
 
-
-class TeamAdmin(admin.ModelAdmin):
-    readonly_fields = ('team_id', 'team_name', 'logo_url')
-    fields = ('team_id', 'team_name', 'logo_url')
-    list_display = [
-        'team_name',
-    ]
-
-
-class YahooGUIDAdmin(admin.ModelAdmin):
-    readonly_fields = ('manager_name', 'yahoo_guid',)
-    fields = ('manager_name', 'yahoo_guid', 'yahoo_team')
-
-    list_display = [
-        'manager_name',
-        'yahoo_guid',
-    ]
 
 class WaiverClaimAdmin(admin.ModelAdmin):
     readonly_fields = ('id',)
@@ -30,7 +13,7 @@ class WaiverClaimAdmin(admin.ModelAdmin):
          {'fields': ['claim_start']}
          ),
         ('Team',
-         {'fields': ['team']}
+         {'fields': ['yahoo_team']}
          ),
         ('Overclaim/Cancelled',
          {
@@ -68,13 +51,11 @@ class WaiverClaimAdmin(admin.ModelAdmin):
         'pk',
         'add_player',
         'drop_player',
-        'team',
+        'yahoo_team',
         'active_claim'
     ]
 
 
-admin.site.register(YahooTeam, TeamAdmin)
-admin.site.register(YahooGUID, YahooGUIDAdmin)
 admin.site.register(WaiverClaim, WaiverClaimAdmin)
 
 # UserAdmin.list_display = ('email', 'is_staff')

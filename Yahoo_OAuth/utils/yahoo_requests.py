@@ -5,12 +5,12 @@ from django.conf import settings
 from urllib.parse import urlencode
 
 
-# from JJE_App.settings import BASE_DIR
-# import os
-# def _get_standings_local():
-#     # todo remove this
-#     with open(os.path.join(BASE_DIR, 'JJE_Standings/tests/data.html'), 'r') as fl:
-#         return {'results': fl.read(), 'status_code': 200}
+from JJE_App.settings import BASE_DIR
+import os
+def _get_local(file_name):
+    # todo remove this
+    with open(os.path.join(BASE_DIR, f'test_files/{file_name}'), 'r') as fl:
+        return {'results': fl.read(), 'status_code': 200}
 
 
 def create_session(token):
@@ -21,8 +21,8 @@ def create_session(token):
 
 
 def get_standings(request):
-    #
-    # return _get_standings_local()
+    return _get_local('standings.txt')
+
     token = request.user.usertoken_set.first()
     # token = UserToken.objects.get(standings_token=True)
     yahoo_obj = create_session(token)
@@ -30,10 +30,22 @@ def get_standings(request):
 
 
 def get_teams(request):
+    return _get_local('standings.txt')
+
     token = request.user.usertoken_set.first()
     # token = UserToken.objects.get(standings_token=True)
     yahoo_obj = create_session(token)
     r = request_teams(yahoo_obj)
+    return r
+
+
+def get_user_teams(request):
+    return _get_local('userteams.txt')
+
+    token = request.user.usertoken_set.first()
+    # token = UserToken.objects.get(standings_token=True)
+    yahoo_obj = create_session(token)
+    r = request_teams(yahoo_obj, True)
     return r
 
 
@@ -65,6 +77,9 @@ def request_player(yahoo_obj, player_id):
     return _get_request(yahoo_obj, url)
 
 
-def request_teams(yahoo_obj):
-    url = f"https://fantasysports.yahooapis.com/fantasy/v2/league/{settings.LEAGUE_ID}/teams;use_login=1"
+def request_teams(yahoo_obj, use_login=False):
+    url = f"https://fantasysports.yahooapis.com/fantasy/v2/league/{settings.LEAGUE_ID}/teams"
+    if use_login:
+        url += ';use_login=1'
+
     return _get_request(yahoo_obj, url)
