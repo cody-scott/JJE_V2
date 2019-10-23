@@ -4,8 +4,6 @@ from django.contrib.auth.models import User
 
 import datetime
 
-# Create your models here.
-
 
 class UserToken(models.Model):
     """This is just for the API to collect and update the app"""
@@ -18,8 +16,6 @@ class UserToken(models.Model):
     user_guid = models.TextField()
 
     user = models.ForeignKey(User, default=None, blank=True, null=True, on_delete=models.SET_NULL)
-
-    standings_token = models.BooleanField(default=False)
 
     def __repr__(self):
         return "<ID: {}>".format(self.id)

@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import math
 import requests
+import os
 
 
 def update_standings(token):
@@ -15,10 +16,10 @@ def update_standings(token):
 
     site = Site.objects.first()
 
-    url = site.domain + "oauth/api/getstandings/"
+    url = os.path.join(site.domain, "oauth/api/getstandings/")
     headers = {'Authorization': f'Token {token}'}
 
-    res = requests.get(url, headers=headers)
+    res = requests.get(url, headers=headers, verify=settings.VERIFY_REQUEST)
 
     if res.status_code != 200:
         print("Error")

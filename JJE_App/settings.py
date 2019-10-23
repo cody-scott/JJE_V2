@@ -35,14 +35,15 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv("SECRET_KEY", "empty_secret")
 
 ALLOWED_HOSTS = ['jje-league.herokuapp.com', 'jje-test-site.herokuapp.com']
+VERIFY_REQUEST = True
 
-# SECURITY WARNING: don't run with debug turned on in production!
 if os.getenv("DEBUG") is not None:
     print("DEBUGGING MODE")
     DEBUG = True
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     ACCOUNT_EMAIL_VERIFICATION = "none"
     ALLOWED_HOSTS += ['127.0.0.1', '0.0.0.0', 'localhost', 'www.myapp.test', "*"]
+    VERIFY_REQUEST = False
 
 
 INTERNAL_IPS = ["127.0.0.1"]
@@ -75,6 +76,7 @@ INSTALLED_APPS = [
     'JJE_Main.apps.JJEMainConfig',
     'Yahoo_OAuth.apps.YahooAuthenticationConfig',
     'JJE_Standings.apps.JJEStandingsConfig',
+    'JJE_Waivers.apps.JJEWaiversConfig',
 ]
 
 MIDDLEWARE = [

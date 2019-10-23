@@ -58,8 +58,8 @@ def save_new_token(token, request):
     user_token.refresh_token = refresh_token
     user_token.user_guid = guid
 
-    if len(UserToken.objects.filter(standings_token=False)) == 0:
-        user_token.standings_token = True
+    # if len(UserToken.objects.filter(standings_token=False)) == 0:
+    #     user_token.standings_token = True
 
     user_token.save()
 

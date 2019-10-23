@@ -15,6 +15,7 @@ class StandingsAdmin(admin.ModelAdmin):
 
 
 class TeamAdmin(admin.ModelAdmin):
+    readonly_fields = ('team_id', 'team_name', 'logo_url')
     fields = ('team_id', 'team_name', 'logo_url')
     list_display = [
         'team_name',
@@ -22,6 +23,7 @@ class TeamAdmin(admin.ModelAdmin):
 
 
 class YahooGUIDAdmin(admin.ModelAdmin):
+    readonly_fields = ('manager_name', 'yahoo_guid')
     fields = ('manager_name', 'yahoo_guid', 'yahoo_team')
 
     list_display = [

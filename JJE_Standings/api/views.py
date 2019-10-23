@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from JJE_Standings.api import serializer
 from JJE_Standings.models import YahooStanding, YahooGUID, YahooTeam
+from JJE_Standings.api import filters as api_filter
 
 
 # Overall View for GUID -> yahoo team with standings as hyperlink
@@ -26,7 +27,6 @@ class YahooTeamGUIDViewSetCurrentWeek(viewsets.ReadOnlyModelViewSet):
 
     permission_classes = [permissions.IsAuthenticated]
 
-from JJE_Standings.api import filters as api_filter
 
 class CurrentStandingsViewSet(viewsets.ReadOnlyModelViewSet):
     filter_class = api_filter.RankingFilter

@@ -11,7 +11,8 @@ urlpatterns = [
 
 
 urlpatterns += [
-    url(r'api/getstandings', api_views.get_standings, name="get_standings")
+    url(r'api/getstandings', api_views.get_standings, name="get_standings"),
+    url(r'api/getuserteams', api_views.get_user_team, name="get_user_teams"),
 ]
 
 

@@ -17,6 +17,9 @@ router = DefaultRouter()
 from JJE_Standings.urls import router as standings_router
 router.registry.extend(standings_router.registry)
 
+from JJE_Waivers.urls import router as waivers_router
+router.registry.extend(waivers_router.registry)
+
 # from Yahoo_OAuth.urls import router as yahoo_oauth_router
 # router.registry.extend(yahoo_oauth_router.registry)
 
@@ -30,6 +33,7 @@ urlpatterns += [
     url(r'^', include('JJE_Main.urls'), name='main'),
     url(r'^oauth/', include('Yahoo_OAuth.urls'), name='Yahoo_OAuth'),
     url(r'^standings/', include('JJE_Standings.urls'), name='JJE_Standings'),
+    url(r'^waivers/', include('JJE_Waivers.urls'), name='JJE_Waivers'),
 
     url(r'^api-auth/', include('rest_framework.urls')),
 

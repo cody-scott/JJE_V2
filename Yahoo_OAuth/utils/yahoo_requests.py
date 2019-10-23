@@ -29,6 +29,14 @@ def get_standings(request):
     return request_standings(yahoo_obj)
 
 
+def get_teams(request):
+    token = request.user.usertoken_set.first()
+    # token = UserToken.objects.get(standings_token=True)
+    yahoo_obj = create_session(token)
+    r = request_teams(yahoo_obj)
+    return r
+
+
 def _get_request(yahoo_obj, url):
     result = yahoo_obj.request("get", url)
     results, status_code = result.text, result.status_code
@@ -54,4 +62,9 @@ def request_players(yahoo_obj, player_dict):
 
 def request_player(yahoo_obj, player_id):
     url = f"https://fantasysports.yahooapis.com/fantasy/v2/league/{settings.LEAGUE_ID}/players;player_keys=nhl.p.{player_id}/stats"
+    return _get_request(yahoo_obj, url)
+
+
+def request_teams(yahoo_obj):
+    url = f"https://fantasysports.yahooapis.com/fantasy/v2/league/{settings.LEAGUE_ID}/teams;use_login=1"
     return _get_request(yahoo_obj, url)

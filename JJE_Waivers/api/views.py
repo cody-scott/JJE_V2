@@ -1,26 +1,17 @@
-# from rest_framework import viewsets
-#
-# from JJE_Waivers.api.serializer import WaiverClaimSerializer
-# from JJE_Waivers.models import WaiverClaim
-#
-# from django.utils import timezone
-# from datetime import timedelta
-#
-#
-# class WaiverClaimViewSet(viewsets.ReadOnlyModelViewSet):
-#     queryset = WaiverClaim.objects.all()
-#     serializer_class = WaiverClaimSerializer
-#
-#
-# class ActiveWaiverclaimViewSet(viewsets.ReadOnlyModelViewSet):
-#     queryset = WaiverClaim.objects.all()
-#     serializer_class = WaiverClaimSerializer
-#
-#     def get_queryset(self):
-#         now = timezone.now() - timedelta(days=1)
-#         claims = WaiverClaim.objects \
-#             .filter(cancelled=False) \
-#             .filter(overclaimed=False) \
-#             .filter(claim_start__gt=now) \
-#             .order_by('claim_start')
-#         return claims
+from rest_framework import viewsets, permissions
+from rest_framework.response import Response
+
+from JJE_Waivers.api import serializer
+from JJE_Waivers.models import YahooGUID
+
+
+# Returns GUID -> teams with current weekly rank of that team
+class YahooTeamGUIDViewSetCurrentWeek(viewsets.ReadOnlyModelViewSet):
+    queryset = YahooGUID.objects.all()
+    serializer_class = serializer.YahooCurrentGUIDSerializer
+
+    filterset_fields = (
+        'yahoo_guid',
+    )
+
+    permission_classes = [permissions.IsAuthenticated]
