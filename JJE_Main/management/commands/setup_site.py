@@ -7,12 +7,13 @@ class Command(BaseCommand):
     help = 'Setup Site'
 
     def add_arguments(self, parser):
-        pass
+        parser.add_argument('domain')
+        parser.add_argument('name')
 
     def handle(self, *args, **options):
         s = Site.objects.first()
-        s.domain = "https://www.myapp.test/"
-        s.name = "Development URL"
+        s.domain = options.get('domain')
+        s.name = options.get('name')
         s.save()
 
         for u in User.objects.all():

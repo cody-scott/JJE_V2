@@ -1,6 +1,6 @@
 from django.db import models
 
-from JJE_Main.models import YahooTeam
+from JJE_Main.models import YahooTeam as _YahooTeam
 
 
 class YahooStanding(models.Model):
@@ -8,7 +8,7 @@ class YahooStanding(models.Model):
     date_created = models.DateTimeField(auto_now=True)
 
     # yahoo_team_uid = models.IntegerField()
-    yahoo_team = models.ForeignKey(YahooTeam, default=None, blank=True, null=True, on_delete=models.SET_NULL,
+    yahoo_team = models.ForeignKey(_YahooTeam, default=None, blank=True, null=True, on_delete=models.SET_NULL,
                                    related_name='standing_team')
 
     rank = models.IntegerField()

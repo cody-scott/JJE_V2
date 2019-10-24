@@ -130,7 +130,7 @@ DATABASES = {
 # }
 
 # Authentication Data
-LOGIN_REDIRECT_URL = 'index'
+LOGIN_REDIRECT_URL = 'waivers_index'
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
@@ -189,6 +189,8 @@ EMAIL_HOST_USER = os.getenv("email_user")
 EMAIL_HOST_PASSWORD = os.getenv("email_password")
 ADMINS = (('Admin', os.getenv("email_user")),)
 
+EMAIL_LEVEL = os.getenv("EMAIL_LEVEL", "")
+SEND_EMAIL = os.getenv("SEND_EMAIL", True)
 
 # api config
 client_id = os.getenv("client_id")

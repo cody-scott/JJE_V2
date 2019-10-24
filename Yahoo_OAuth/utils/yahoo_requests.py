@@ -23,7 +23,7 @@ def create_session(token):
 
 
 def get_standings(request):
-    # return _get_local('standings.txt')
+    return _get_local('standings.txt')
 
     token = request.user.usertoken_set.first()
     # token = UserToken.objects.get(standings_token=True)
@@ -32,7 +32,7 @@ def get_standings(request):
 
 
 def get_teams(request):
-    # return _get_local('standings.txt')
+    return _get_local('standings.txt')
 
     token = request.user.usertoken_set.first()
     # token = UserToken.objects.get(standings_token=True)
@@ -42,7 +42,7 @@ def get_teams(request):
 
 
 def get_user_teams(request):
-    # return _get_local('userteams.txt')
+    return _get_local('userteams.txt')
 
     token = request.user.usertoken_set.first()
     # token = UserToken.objects.get(standings_token=True)

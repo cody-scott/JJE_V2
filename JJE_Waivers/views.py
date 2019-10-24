@@ -1,54 +1,27 @@
-from datetime import timedelta
-
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView
 from django.contrib import messages
 
-
 from JJE_Waivers.models import WaiverClaim
-from JJE_Waivers.utils import show_oauth_link
-from JJE_Waivers.utils import api_calls
 
+from JJE_Main.utils import jje_main_functions
+from JJE_Standings.utils import jje_standings_functions
 
-from JJE_Waivers.utils import waiver_functions
-
-
-from django.http import HttpResponse
-from django.views import View
-
-
-from django.http import JsonResponse
-from JJE_Main.models import YahooTeam
-
-
-# class MyView(View):
-#     def get(self, request, *args, **kwargs):
-#         teams = api_calls.get_users_teams_waivers(request)
-#         overclaims = api_calls.get_overclaim_teams(request, teams)
-#
-#         return JsonResponse({'a': 1})
-#         # return JsonResponse(yahoo_team.get_user_teams(request).json(), safe=False)
-
+from JJE_Waivers.utils import jje_waiver_functions
+from JJE_Waivers.utils import email_functions
 
 class IndexView(ListView):
     template_name = "JJE_Waivers/waivers_index.html"
 
     def get_queryset(self):
-        now = timezone.now() - timedelta(days=1)
-        claims = WaiverClaim.objects \
-            .filter(cancelled=False) \
-            .filter(overclaimed=False) \
-            .filter(claim_start__gt=now) \
-            .order_by('claim_start')
-        return claims
+        return jje_waiver_functions.get_active_claims()
 
     def get_context_data(self, **kwargs):
-        oauth_display = show_oauth_link(self.request)
+        oauth_display = jje_waiver_functions.show_oauth_link(self.request)
 
         context = super(IndexView, self).get_context_data(**kwargs)
 
@@ -56,12 +29,12 @@ class IndexView(ListView):
         overclaim_teams = []
         if (not self.request.user.is_anonymous) and (oauth_display is False):
             # query for users teams via api using GUID
-            user_teams = api_calls.get_users_teams_waivers_request(self.request)
-
+            guid = self.request.user.usertoken_set.first().user_guid
+            user_teams = jje_main_functions.get_users_teams_ids(guid)
             # these ids are the teams that the user CAN overclaim
-            overclaim_teams = api_calls.get_overclaim_teams(self.request, user_teams)
+            overclaim_teams = jje_standings_functions.get_overclaim_teams(user_teams)
 
-        context['user_team_ids'] = [val['id'] for val in user_teams]
+        context['user_team_ids'] = user_teams
         context['overclaim_ids'] = overclaim_teams
         context['show_oauth'] = oauth_display
         return context
@@ -87,28 +60,24 @@ class WaiverClaimCreate(CreateView):
 
     def get_form(self, form_class=None):
         frm = super(WaiverClaimCreate, self).get_form(form_class)
-
-        ids = api_calls.get_users_teams_waivers_request(self.request)
-        usr_teams = [v.get('id') for v in ids]
-
-        frm.fields['yahoo_team'].queryset = YahooTeam.objects.filter(
-            id__in=usr_teams
-        )
-
+        guid = self.request.user.usertoken_set.first().user_guid
+        frm.fields['yahoo_team'].queryset = jje_main_functions.get_users_teams_qs(guid)
         return frm
 
     def get_initial(self):
-        ids = api_calls.get_users_teams_waivers_request(self.request)
-        usr_teams = {'yahoo_team': v.get('id') for v in ids}
-
-        return usr_teams
+        guid = self.request.user.usertoken_set.first().user_guid
+        ids = jje_main_functions.get_users_teams_waivers(guid)
+        if len(ids) == 1:
+            return {'yahoo_team': v.get('id') for v in ids}
+        else:
+            return {'yahoo_team': None}
 
     def form_valid(self, form):
         valid_form = super(WaiverClaimCreate, self).form_valid(form)
         messages.add_message(self.request, messages.INFO,
                              "Claim Successful")
-        # email_functions.claim_email(self.object, "New Claim", self.request)
-        return valid_form
+        email_functions.claim_email(self.object, "New Claim", self.request)
+        return redirect(reverse('waivers_index'))
 
 
 @method_decorator(login_required, name='dispatch')
@@ -124,38 +93,39 @@ class OverclaimCreate(CreateView):
 
     def get(self, request, *args, **kwargs):
         try:
-            if not waiver_functions.check_if_standings():
+            if not jje_standings_functions.check_if_standings():
                 raise AssertionError
 
             wc_id = self.kwargs.get("pk")
             player = WaiverClaim.objects.get(id=wc_id)
-
+            # asserting the claim is still active
             if not player.active_claim():
                 messages.add_message(request, messages.WARNING,
                                      "Waiver claim is no longer active")
                 assert player.active_claim()
 
-            claim_team_standing = api_calls.get_claim_team_rank(self.request, player.yahoo_team.id)
-            claimee_standings = api_calls.get_user_team_ranks(self.request)
-
-            if len(claimee_standings) > 0:
-                cts = claim_team_standing
-                cee = max(claimee_standings)
-                if cts >= cee:
-                    messages.add_message(request, messages.WARNING,
-                                         "Claim team is lower ranked then you")
-                    raise AssertionError
+            # want to assert that the team holding the claim is in the overclaim list
+            guid = self.request.user.usertoken_set.first().user_guid
+            user_teams = jje_main_functions.get_users_teams_waivers(guid)
+            team_ids = [t['id'] for t in user_teams]
+            # these ids are the teams that the user CAN overclaim
+            overclaim_teams = jje_standings_functions.get_overclaim_teams(team_ids)
+            if not player.yahoo_team.id in overclaim_teams:
+                messages.add_message(request, messages.WARNING,
+                                     "Claim team is lower ranked then you")
+                raise AssertionError
 
             return super(OverclaimCreate, self).get(request, *args, **kwargs)
         except Exception as e:
-            return e
-            print(e)
             return redirect(reverse("waivers_index"))
 
     def get_initial(self):
-        ids = api_calls.get_users_teams_waivers_request(self.request)
-        usr_teams = {'yahoo_team': v.get('id') for v in ids}
-        return usr_teams
+        guid = self.request.user.usertoken_set.first().user_guid
+        ids = jje_main_functions.get_users_teams_waivers(guid)
+        if len(ids) == 1:
+            return {'yahoo_team': v.get('id') for v in ids}
+        else:
+            return {'yahoo_team': None}
 
     def get_form(self, form_class=None):
         frm = super(OverclaimCreate, self).get_form(form_class)
@@ -193,28 +163,22 @@ class OverclaimCreate(CreateView):
         messages.add_message(self.request, messages.INFO,
                              "Overclaim Successful")
 
-        # email_functions.claim_email(self.object, "Overclaim", self.request)
-
-        return valid_form
+        email_functions.claim_email(self.object, "Overclaim", self.request)
+        return redirect(reverse('waivers_index'))
 
     def get_rank(self, request, player):
-        try:
-            player = player
-            rank = player.team.yahoostanding_set.filter(
-                current_standings=True
-            ).first().rank
-
-            ranks = [
-                team.team.id
-                for team in YahooStanding.objects.filter(
-                    current_standings=True).filter(rank__gte=rank).all()
-
-            ]
-            return YahooTeam.objects.filter(pk__in=ranks) \
-                .filter(user=self.request.user.id)
-        except:
-            return YahooTeam.objects.filter(user=self.request.user.id) \
-                .exclude(id=player.team.id)
+        # get the id of the claim team
+        team_id = player.yahoo_team.id
+        # get the overclaim ids for current claim holder that team
+        overclaim_teams = jje_standings_functions.get_overclaim_teams([team_id])
+        overclaim_teams.append(team_id)
+        # exclude any teams that are in the overclaim list
+        guid = self.request.user.usertoken_set.first().user_guid
+        user_teams = jje_main_functions.get_users_teams_ids(guid)
+        # filter list of team ids that can overclaim
+        user_overclaim_teams = [x for x in user_teams if x not in overclaim_teams]
+        team_qs = jje_main_functions.get_teams_qs(user_overclaim_teams)
+        return team_qs
 
 
 @method_decorator(login_required, name='dispatch')
@@ -226,35 +190,27 @@ class CancelClaimView(DetailView):
         id = int(k.get("pk"))
         claim_obj = WaiverClaim.objects.filter(id=id).first()
         if claim_obj is None or not claim_obj.active_claim():
-            return redirect(reverse("index"))
+            return redirect(reverse("waivers_index"))
 
-        if self.check_if_user_claim(request, id):
-            return super(CancelClaimView, self).get(request, *a, **k)
-        else:
-            return redirect(reverse("index"))
+        guid = self.request.user.usertoken_set.first().user_guid
+        user_teams = jje_main_functions.get_users_teams_ids(guid)
+        if not claim_obj.yahoo_team.id in user_teams:
+            return redirect(reverse("waivers_index"))
 
-    def check_if_user_claim(self, request, id):
-        for team in [team for team in self.request.user.yahooteam_set.all()]:
-            claims = [claim.id for claim in team.waiverclaim_set.all()]
-            if id in claims:
-                return True
-        return False
+        return super(CancelClaimView, self).get(request, *a, **k)
 
     def post(self, request, *args, **kwargs):
-        if request.user.yahooteam_set is None:
-            return redirect(reverse('index'))
-
         claim_id = kwargs.get("pk")
         claim = get_object_or_404(WaiverClaim, id=claim_id)
 
-        if claim.team.id not in [
-            team.id for team in request.user.yahooteam_set.all()
-        ]:
-            return redirect(reverse('index'))
+        guid = self.request.user.usertoken_set.first().user_guid
+        user_teams = jje_main_functions.get_users_teams_ids(guid)
+        if not claim.yahoo_team.id in user_teams:
+            return redirect(reverse('waivers_index'))
 
         claim.cancelled = True
         claim.save()
         messages.add_message(self.request, messages.INFO,
                              "Claim cancelled")
         email_functions.cancel_email(claim, request)
-        return redirect(reverse('index'))
+        return redirect(reverse('waivers_index'))

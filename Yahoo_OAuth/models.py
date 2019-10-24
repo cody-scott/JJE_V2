@@ -12,7 +12,6 @@ class UserToken(models.Model):
     client_secret = models.TextField()
     access_token = models.TextField()
     refresh_token = models.TextField()
-    session_handle = models.TextField()
     user_guid = models.TextField()
 
     user = models.ForeignKey(User, default=None, blank=True, null=True, on_delete=models.SET_NULL)

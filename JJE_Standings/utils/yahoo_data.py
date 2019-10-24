@@ -1,6 +1,7 @@
 from JJE_Standings.models import YahooStanding
 
 from django.conf import settings
+from django.db import transaction
 
 from django.contrib.sites.models import Site
 
@@ -65,6 +66,7 @@ def set_standings_not_current():
         item.save()
 
 
+@transaction.atomic
 def process_new_standings(results, teams_json):
     standings_soup = BeautifulSoup(results, 'html.parser')
 
