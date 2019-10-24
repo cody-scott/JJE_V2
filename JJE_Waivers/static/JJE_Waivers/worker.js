@@ -48,7 +48,6 @@ function timer_function() {
                         outvm += ("0" + hr);
                         outvm += ":"
                     }
-
                 }
 
                 if (mn < 10) {outvm += "0"}

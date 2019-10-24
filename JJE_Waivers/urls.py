@@ -22,11 +22,11 @@ urlpatterns += [
         views.WaiverClaimCreate.as_view(),
         name="waiver_claim-add"),
 
-    # url(r'^waiver_claim/overclaim=(?P<pk>[0-9]+)$',
-    #     views.OverclaimCreate.as_view(),
-    #     name="waiver_claim-overclaim"),
-    # url(r'^waiver_claim/cancel=(?P<pk>[0-9]+)$',
-    #     views.CancelClaimView.as_view(),
-    #     name="waiver_claim-cancel"),
+    url(r'^overclaim=(?P<pk>[0-9]+)$',
+        views.OverclaimCreate.as_view(),
+        name="waiver_claim-overclaim"),
+    url(r'^cancel=(?P<pk>[0-9]+)$',
+        views.CancelClaimView.as_view(),
+        name="waiver_claim-cancel"),
 ]
 

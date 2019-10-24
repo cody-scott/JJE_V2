@@ -32,8 +32,8 @@
     {% for claim in object_list %}
         <div class="container claim-container" id={{ claim.id }}>
             <div class="row">
-                <div team_id="{{ claim.team.id }}" class="col-lg-12">
-                    <h4>Team: <strong>{{ claim.team }}</strong></h4>
+                <div team_id="{{ claim.yahoo_team.id }}" class="col-lg-12">
+                    <h4>Team: <strong>{{ claim.yahoo_team }}</strong></h4>
                 </div>
             </div>
             <div class="row">
@@ -55,11 +55,11 @@
 
             <div class="row">
                 <div class="col-lg-12 TIMEROW">
-                    <h5>Time Remaining <p class="timecounter" end-time="{{ claim.claim_end }}">--:--:--</p></h5>
+                    <h5>Time Remaining <p class="timecounter" end-time="{{ claim.claim_end_iso }}">--:--:--</p></h5>
                 </div>
             </div>
 
-            {% if not user.is_anonymous and claim.team.id not in overclaim_ids %}
+            {% if not user.is_anonymous and claim.yahoo_team.id in overclaim_ids %}
                 <div class="row">
                     <div class="col-lg-3">
                         <form action="{% url 'waiver_claim-overclaim' pk=claim.id %}">
@@ -69,7 +69,7 @@
                 </div>
             {% endif %}
 
-            {% if claim.team.id in user_team_ids%}
+            {% if claim.yahoo_team.id in user_team_ids%}
                 <div class="row">
                     <div class="col-lg-3">
                         <form action="{% url 'waiver_claim-cancel' pk=claim.id %}">
@@ -82,7 +82,9 @@
 
         </div>
         <hr class="hr_claim_{{ claim.id }}">
+
     {% empty %}
+
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">

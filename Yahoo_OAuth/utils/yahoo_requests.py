@@ -7,6 +7,8 @@ from urllib.parse import urlencode
 
 from JJE_App.settings import BASE_DIR
 import os
+
+
 def _get_local(file_name):
     # todo remove this
     with open(os.path.join(BASE_DIR, f'test_files/{file_name}'), 'r') as fl:
@@ -21,7 +23,7 @@ def create_session(token):
 
 
 def get_standings(request):
-    return _get_local('standings.txt')
+    # return _get_local('standings.txt')
 
     token = request.user.usertoken_set.first()
     # token = UserToken.objects.get(standings_token=True)
@@ -30,7 +32,7 @@ def get_standings(request):
 
 
 def get_teams(request):
-    return _get_local('standings.txt')
+    # return _get_local('standings.txt')
 
     token = request.user.usertoken_set.first()
     # token = UserToken.objects.get(standings_token=True)
@@ -40,7 +42,7 @@ def get_teams(request):
 
 
 def get_user_teams(request):
-    return _get_local('userteams.txt')
+    # return _get_local('userteams.txt')
 
     token = request.user.usertoken_set.first()
     # token = UserToken.objects.get(standings_token=True)
