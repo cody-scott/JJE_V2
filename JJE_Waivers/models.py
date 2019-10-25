@@ -38,7 +38,7 @@ class WaiverClaim(models.Model):
     overclaimed = models.BooleanField(default=False)
     cancelled = models.BooleanField(default=False)
 
-    claim_message = models.TextField(blank=True)
+    claim_message = models.TextField(blank=True, null=True)
 
     def get_absolute_url(self):
         return reverse('index')

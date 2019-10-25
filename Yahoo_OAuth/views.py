@@ -4,6 +4,7 @@ from django.contrib.sites.models import Site
 
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.urls import reverse
 
 import django.dispatch
 
@@ -26,7 +27,7 @@ class OAuthCallback(View):
     def get(self, request):
         callback_oauth(request)
         oauth_complete_signal.send(sender=self.__class__, request=request)
-        return redirect(Site.objects.first().domain)
+        return redirect(reverse("waivers_index"))
 
 
 @method_decorator(login_required, name='dispatch')
@@ -34,4 +35,4 @@ class OAuthRefresh(View):
     def get(self, request):
         refresh_current_token(request)
         oauth_refresh_signal.send(sender=self.__class__, request=request)
-        return redirect(Site.objects.first().domain)
+        return redirect(reverse("waivers_index"))

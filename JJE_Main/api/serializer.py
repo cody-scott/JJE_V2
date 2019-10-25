@@ -36,16 +36,3 @@ class YahooTeamOnlySerializer(serializers.ModelSerializer):
         fields = (
             'yahoo_team',
         )
-
-
-class EmailSerializer(serializers.ModelSerializer):
-    is_staff = serializers.BooleanField(source='user.is_staff')
-    is_superuser = serializers.BooleanField(source='user.is_superuser')
-
-    class Meta:
-        model = EmailAddress
-        fields = (
-            'email',
-            'is_staff',
-            'is_superuser',
-        )

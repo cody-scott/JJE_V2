@@ -1,3 +1,4 @@
+{% load tz %}
 <!DOCTYPE html>
 <html>
 <style>
@@ -33,16 +34,18 @@
     </tr>
     {% for item in DATA %}
         <tr>
-            <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;"> {{ item.2 }}</td>
-            <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;"> {{ item.1 }}</td>
-            <td class="imgc" style="border: 1px solid #dddddd;text-align: left;padding: 8px;border-left: 2px solid transparent;"> <img class="imgclass" src="{{ item.4 }}" style="border-radius: 50%;width: 50px;height: 50px;"></td>
-            <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;"> {{ item.3 }}</td>
+            <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;">{{ item.rank }}</td>
+            <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;">{{ item.yahoo_team.team_name }}</td>
+            <td class="imgc" style="border: 1px solid #dddddd;text-align: left;padding: 8px;border-left: 2px solid transparent;"><img class="imgclass" src="{{ item.yahoo_team.logo_url }}" style="border-radius: 50%;width: 50px;height: 50px;"></td>
+            <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;">{{ item.stat_point_total }}</td>
         </tr>
     {% endfor %}
 </table>
 
 <br><br>
-{{ DATETIME }}
+{% timezone "America/Toronto" %}
+    {{ DATETIME }}
+{% endtimezone %}
 <br><br>
 </body>
 </html>

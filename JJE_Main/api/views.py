@@ -34,14 +34,3 @@ class YahooTeamViewSet(viewsets.ReadOnlyModelViewSet):
         if self.request.user.is_authenticated:
             api_calls.update_teams(self.request)
         return YahooTeam.objects.all()
-
-
-class EmailViewSet(viewsets.ReadOnlyModelViewSet):
-
-    queryset = EmailAddress.objects.all()
-    serializer_class = serializer.EmailSerializer
-
-    permission_classes = [permissions.IsAdminUser]
-
-    def get_queryset(self):
-        return [e for e in EmailAddress.objects.all() if e.verified]

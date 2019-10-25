@@ -6,7 +6,6 @@ router = SimpleRouter()
 
 router.register(r'guid', main_api.YahooTeamGUIDViewSetCurrentWeek, 'guid_api')
 router.register(r'teams', main_api.YahooTeamViewSet, 'teams_api')
-router.register(r'emails', main_api.EmailViewSet, 'email_api')
 
 urlpatterns = [
     url(r'api/', include(router.urls), name='main_api')

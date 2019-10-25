@@ -50,6 +50,12 @@ def update_standings(token):
     print(f"token {token}")
 
     yahoo_res = query_standings(token)
+
+    if yahoo_res is None:
+        # todo error logging here
+        print("error")
+        return False
+
     new_standings = yahoo_res['results']
     status_code = yahoo_res['status_code']
 
@@ -58,6 +64,8 @@ def update_standings(token):
     set_standings_not_current()
 
     process_new_standings(new_standings, teams)
+
+    return True
 
 
 def set_standings_not_current():

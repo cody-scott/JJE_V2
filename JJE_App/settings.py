@@ -114,13 +114,13 @@ WSGI_APPLICATION = 'JJE_App.wsgi.application'
 # TODO set to SQL lite for development, but should be changed to postgres
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'jje_v2.sqlite3')
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': os.path.join(BASE_DIR, 'jje_v2.sqlite3')
     }
 }
 
-# db_from_env = dj_database_url.config(conn_max_age=500)
-# DATABASES['default'].update(db_from_env)
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
 
 # # cache
 # CACHES = {
@@ -175,11 +175,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
-
-# STATICFILES_FINDERS = (
-# 'django.contrib.staticfiles.finders.FileSystemFinder',
-# 'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-# )
 
 # email config
 EMAIL_USE_TLS = True

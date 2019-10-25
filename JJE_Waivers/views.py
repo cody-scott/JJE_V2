@@ -14,6 +14,7 @@ from JJE_Standings.utils import jje_standings_functions
 from JJE_Waivers.utils import jje_waiver_functions
 from JJE_Waivers.utils import email_functions
 
+
 class IndexView(ListView):
     template_name = "JJE_Waivers/waivers_index.html"
 
