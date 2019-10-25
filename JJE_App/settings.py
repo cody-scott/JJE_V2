@@ -34,7 +34,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY", "empty_secret")
 
-ALLOWED_HOSTS = ['jje-league.herokuapp.com', 'jje-test-site.herokuapp.com']
+ALLOWED_HOSTS = ['jje-league.herokuapp.com', 'jje-test-site.herokuapp.com', 'www.myapp.test',]
 VERIFY_REQUEST = True
 
 if os.getenv("DEBUG") is not None:
@@ -87,6 +87,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'JJE_App.urls'

@@ -13,3 +13,4 @@ beautifulsoup4
 django-filter
 requests
 django-url-filter
+whitenoise
