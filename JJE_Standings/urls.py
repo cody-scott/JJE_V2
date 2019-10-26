@@ -12,4 +12,6 @@ urlpatterns = [url(r'api/', include(router.urls))]
 
 urlpatterns += [
     url(r'^$', views.IndexView.as_view(), name='standings_index'),
+
+    url(r'update_weekly_standings/', standings_api.get_new_standings_data, name='update_weekly_standings'),
 ]
