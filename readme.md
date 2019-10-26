@@ -17,6 +17,10 @@
     DJANGO_SETTINGS_MODULE="JJE_App.settings"
     DEBUG="TRUE"
     
+    EMAIL_LEVEL="SUPER_USER"
+
+    # if you don't want to send an email
+    SEND_EMAIL="False"
     
     
 ## Start chrome

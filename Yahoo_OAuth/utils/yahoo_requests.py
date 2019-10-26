@@ -35,7 +35,6 @@ def get_teams(request):
     # return _get_local('standings.txt')
 
     token = request.user.usertoken_set.first()
-    # token = UserToken.objects.get(standings_token=True)
     yahoo_obj = create_session(token)
     r = request_teams(yahoo_obj)
     return r
@@ -45,7 +44,6 @@ def get_user_teams(request):
     # return _get_local('userteams.txt')
 
     token = request.user.usertoken_set.first()
-    # token = UserToken.objects.get(standings_token=True)
     yahoo_obj = create_session(token)
     r = request_teams(yahoo_obj, True)
     return r
